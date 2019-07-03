@@ -1,18 +1,19 @@
 #set( $limit = $util.defaultIfNull($context.args.limit, 10) )
+#set( $query = {
+  "expression": "#connectionAttribute = :connectionAttribute",
+  "expressionNames": {
+      "#connectionAttribute": "messageAuthorId"
+  },
+  "expressionValues": {
+      ":connectionAttribute": {
+          "S": "$context.source.id"
+    }
+  }
+} )
 {
   "version": "2017-02-28",
   "operation": "Query",
-  "query": {
-      "expression": "#connectionAttribute = :connectionAttribute",
-      "expressionNames": {
-          "#connectionAttribute": "messageConversationId"
-    },
-      "expressionValues": {
-          ":connectionAttribute": {
-              "S": "$context.source.id"
-      }
-    }
-  },
+  "query":   $util.toJson($query),
   "scanIndexForward":   #if( $context.args.sortDirection )
     #if( $context.args.sortDirection == "ASC" )
 true
@@ -33,5 +34,5 @@ null
   #else
 null
   #end,
-  "index": "gsi-ConvoMsgs"
+  "index": "gsi-UserMessages"
 }

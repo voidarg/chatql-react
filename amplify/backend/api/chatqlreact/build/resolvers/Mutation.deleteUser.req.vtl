@@ -2,16 +2,16 @@
 
 
 #if( ! $isStaticGroupAuthorized )
-  ## No Dynamic Group Authorization Rules **
+  ## No dynamic group authorization rules **
 
 
   ## [Start] Owner Authorization Checks **
   #set( $ownerAuthExpressions = [] )
   #set( $ownerAuthExpressionValues = {} )
   #set( $ownerAuthExpressionNames = {} )
-  ## Authorization rule: { allow: "owner", ownerField: "authorId", identityField: "cognito:username" } **
+  ## Authorization rule: { allow: owner, ownerField: "id", identityField: "cognito:username" } **
   $util.qr($ownerAuthExpressions.add("#owner0 = :identity0"))
-  $util.qr($ownerAuthExpressionNames.put("#owner0", "authorId"))
+  $util.qr($ownerAuthExpressionNames.put("#owner0", "id"))
   $util.qr($ownerAuthExpressionValues.put(":identity0", $util.dynamodb.toDynamoDB($util.defaultIfNull($ctx.identity.claims.get("username"), $util.defaultIfNull($ctx.identity.claims.get("cognito:username"), "___xamznone____")))))
   ## [End] Owner Authorization Checks **
 
@@ -72,15 +72,37 @@
 
 #if( $authCondition )
   #set( $condition = $authCondition )
-  $util.qr($condition.put("expression", "$condition.expression AND attribute_exists(#id)"))
-  $util.qr($condition.expressionNames.put("#id", "id"))
+  #if( $modelObjectKey )
+    #foreach( $entry in $modelObjectKey.entrySet() )
+      $util.qr($condition.put("expression", "$condition.expression AND attribute_exists(#keyCondition$velocityCount)"))
+      $util.qr($condition.expressionNames.put("#keyCondition$velocityCount", "$entry.key"))
+    #end
+  #else
+    $util.qr($condition.put("expression", "$condition.expression AND attribute_exists(#id)"))
+    $util.qr($condition.expressionNames.put("#id", "id"))
+  #end
 #else
-  #set( $condition = {
+  #if( $modelObjectKey )
+    #set( $condition = {
+  "expression": "",
+  "expressionNames": {}
+} )
+    #foreach( $entry in $modelObjectKey.entrySet() )
+      #if( $velocityCount == 1 )
+        $util.qr($condition.put("expression", "attribute_exists(#keyCondition$velocityCount)"))
+      #else
+        $util.qr($condition.put("expression", "$condition.expression AND attribute_exists(#keyCondition$velocityCount)"))
+      #end
+      $util.qr($condition.expressionNames.put("#keyCondition$velocityCount", "$entry.key"))
+    #end
+  #else
+    #set( $condition = {
   "expression": "attribute_exists(#id)",
   "expressionNames": {
       "#id": "id"
   }
 } )
+  #end
 #end
 #if( $versionedCondition )
   $util.qr($condition.put("expression", "($condition.expression) AND $versionedCondition.expression"))
@@ -92,8 +114,8 @@
 {
   "version": "2017-02-28",
   "operation": "DeleteItem",
-  "key": {
-      "id": $util.dynamodb.toDynamoDBJson($ctx.args.input.id)
-  },
+  "key": #if( $modelObjectKey ) $util.toJson($modelObjectKey) #else {
+  "id": $util.dynamodb.toDynamoDBJson($ctx.args.input.id)
+} #end,
   "condition": $util.toJson($condition)
 }

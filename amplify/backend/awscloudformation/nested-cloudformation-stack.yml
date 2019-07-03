@@ -81,7 +81,7 @@
 		"authcognito5a6ec086": {
 			"Type": "AWS::CloudFormation::Stack",
 			"Properties": {
-				"TemplateURL": "https://s3.amazonaws.com/chatql-react-20181124121019-deployment/amplify-cfn-templates/auth/cognito5a6ec086-cloudformation-template.yml",
+				"TemplateURL": "https://s3.amazonaws.com/chatql-react-master-20190703111839-deployment/amplify-cfn-templates/auth/cognito5a6ec086-cloudformation-template.yml",
 				"Parameters": {
 					"identityPoolName": "cognito5a6ec086_identitypool_5a6ec086",
 					"allowUnauthenticatedIdentities": true,
@@ -139,14 +139,14 @@
 							"Arn"
 						]
 					},
-					"env": "sandbox"
+					"env": "master"
 				}
 			}
 		},
 		"analyticschatqlreact": {
 			"Type": "AWS::CloudFormation::Stack",
 			"Properties": {
-				"TemplateURL": "https://s3.amazonaws.com/chatql-react-20181124121019-deployment/amplify-cfn-templates/analytics/pinpoint-cloudformation-template.json",
+				"TemplateURL": "https://s3.amazonaws.com/chatql-react-master-20190703111839-deployment/amplify-cfn-templates/analytics/pinpoint-cloudformation-template.json",
 				"Parameters": {
 					"appName": "chatqlreact",
 					"roleName": "pinpointLambdaRole662aef7b",
@@ -166,14 +166,14 @@
 							"Arn"
 						]
 					},
-					"env": "sandbox"
+					"env": "master"
 				}
 			}
 		},
 		"apichatqlreact": {
 			"Type": "AWS::CloudFormation::Stack",
 			"Properties": {
-				"TemplateURL": "https://s3.amazonaws.com/chatql-react-20181124121019-deployment/amplify-cfn-templates/api/cloudformation-template.json",
+				"TemplateURL": "https://s3.amazonaws.com/chatql-react-master-20190703111839-deployment/amplify-cfn-templates/api/cloudformation-template.json",
 				"Parameters": {
 					"AppSyncApiName": "chatqlreact",
 					"AuthCognitoUserPoolId": {
@@ -182,11 +182,9 @@
 							"Outputs.UserPoolId"
 						]
 					},
-					"schemaGraphql": "s3://chatql-react-20181124121019-deployment/amplify-appsync-files/schema.graphql.1543093853587",
-					"ResolverBucket": "chatql-react-20181124121019-deployment",
-					"ResolverRootKey": "amplify-appsync-files",
-					"DeploymentTimestamp": "1543093853587",
-					"env": "sandbox"
+					"S3DeploymentBucket": "chatql-react-master-20190703111839-deployment",
+					"S3DeploymentRootKey": "amplify-appsync-files/e6869b8e1c3e6aded8c66295cfbf7fa132f29006",
+					"env": "master"
 				}
 			}
 		}

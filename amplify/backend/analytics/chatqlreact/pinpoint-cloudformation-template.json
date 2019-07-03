@@ -79,7 +79,7 @@
                         "ShouldNotCreateEnvResources",
                         {
                            "Ref": "roleName"
-                        }, 
+                        },
                         {
 
                             "Fn::Join": [
@@ -94,7 +94,7 @@
                                   }
                                 ]
                             ]
-                        },       
+                        },
                     ]
                 },
                 "AssumeRolePolicyDocument": {
@@ -200,7 +200,7 @@
                     }
                 },
                 "Handler": "index.handler",
-                "Runtime": "nodejs6.10",
+                "Runtime": "nodejs8.10",
                 "Timeout": "300",
                 "Role": {
                     "Fn::GetAtt": [
@@ -225,7 +225,7 @@
                         "ShouldNotCreateEnvResources",
                         {
                            "Ref": "appName"
-                        }, 
+                        },
                         {
 
                             "Fn::Join": [
@@ -240,7 +240,7 @@
                                   }
                                 ]
                             ]
-                        },       
+                        },
                     ]
                 }
             }
@@ -250,7 +250,7 @@
             "Condition": "ShouldCreatePinpointApp",
             "Properties": {
               "PolicyName": {"Ref": "unauthPolicyName" },
-              "Roles": [ 
+              "Roles": [
                 {"Ref": "unauthRoleName" }
               ],
               "PolicyDocument": {
@@ -302,7 +302,7 @@
                                 }
                             ]
                         }
-                
+
                     ]
                   }
                 ]
@@ -314,7 +314,7 @@
             "Condition": "ShouldCreatePinpointApp",
             "Properties": {
               "PolicyName": {"Ref": "authPolicyName" },
-              "Roles": [ 
+              "Roles": [
                 {"Ref": "authRoleName" }
               ],
               "PolicyDocument": {
@@ -366,7 +366,7 @@
                                 }
                             ]
                         }
-                
+
                     ]
                   }
                 ]
@@ -387,10 +387,10 @@
                             "PinpointFunctionOutputs",
                             "Id"
                         ]
-                    }, 
+                    },
                     {
                         "Ref": "appId"
-                    }       
+                    }
                 ]
             }
         },
@@ -403,10 +403,10 @@
                             "PinpointFunctionOutputs",
                             "Name"
                         ]
-                    }, 
+                    },
                     {
                         "Ref": "appName"
-                    }       
+                    }
                 ]
             }
         }

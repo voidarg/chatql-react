@@ -2,16 +2,16 @@
 
 
 #if( ! $isStaticGroupAuthorized )
-  ## No Dynamic Group Authorization Rules **
+  ## No dynamic group authorization rules **
 
 
   ## [Start] Owner Authorization Checks **
   #set( $ownerAuthExpressions = [] )
   #set( $ownerAuthExpressionValues = {} )
   #set( $ownerAuthExpressionNames = {} )
-  ## Authorization rule: { allow: "owner", ownerField: "id", identityField: "cognito:username" } **
+  ## Authorization rule: { allow: owner, ownerField: "authorId", identityField: "cognito:username" } **
   $util.qr($ownerAuthExpressions.add("#owner0 = :identity0"))
-  $util.qr($ownerAuthExpressionNames.put("#owner0", "id"))
+  $util.qr($ownerAuthExpressionNames.put("#owner0", "authorId"))
   $util.qr($ownerAuthExpressionValues.put(":identity0", $util.dynamodb.toDynamoDB($util.defaultIfNull($ctx.identity.claims.get("username"), $util.defaultIfNull($ctx.identity.claims.get("cognito:username"), "___xamznone____")))))
   ## [End] Owner Authorization Checks **
 
@@ -70,87 +70,52 @@
 #end
 ## [End] Throw if unauthorized **
 
-#if( $authCondition && $authCondition.expression != "" )
+#if( $authCondition )
   #set( $condition = $authCondition )
-  $util.qr($condition.put("expression", "$condition.expression AND attribute_exists(#id)"))
-  $util.qr($condition.expressionNames.put("#id", "id"))
+  #if( $modelObjectKey )
+    #foreach( $entry in $modelObjectKey.entrySet() )
+      $util.qr($condition.put("expression", "$condition.expression AND attribute_exists(#keyCondition$velocityCount)"))
+      $util.qr($condition.expressionNames.put("#keyCondition$velocityCount", "$entry.key"))
+    #end
+  #else
+    $util.qr($condition.put("expression", "$condition.expression AND attribute_exists(#id)"))
+    $util.qr($condition.expressionNames.put("#id", "id"))
+  #end
 #else
-  #set( $condition = {
+  #if( $modelObjectKey )
+    #set( $condition = {
+  "expression": "",
+  "expressionNames": {}
+} )
+    #foreach( $entry in $modelObjectKey.entrySet() )
+      #if( $velocityCount == 1 )
+        $util.qr($condition.put("expression", "attribute_exists(#keyCondition$velocityCount)"))
+      #else
+        $util.qr($condition.put("expression", "$condition.expression AND attribute_exists(#keyCondition$velocityCount)"))
+      #end
+      $util.qr($condition.expressionNames.put("#keyCondition$velocityCount", "$entry.key"))
+    #end
+  #else
+    #set( $condition = {
   "expression": "attribute_exists(#id)",
   "expressionNames": {
       "#id": "id"
-  },
-  "expressionValues": {}
+  }
 } )
+  #end
 #end
-## Automatically set the updatedAt timestamp. **
-$util.qr($context.args.input.put("updatedAt", $util.time.nowISO8601()))
-$util.qr($context.args.input.put("__typename", "User"))
-## Update condition if type is @versioned **
 #if( $versionedCondition )
   $util.qr($condition.put("expression", "($condition.expression) AND $versionedCondition.expression"))
   $util.qr($condition.expressionNames.putAll($versionedCondition.expressionNames))
-  $util.qr($condition.expressionValues.putAll($versionedCondition.expressionValues))
-#end
-#set( $expNames = {} )
-#set( $expValues = {} )
-#set( $expSet = {} )
-#set( $expAdd = {} )
-#set( $expRemove = [] )
-#foreach( $entry in $util.map.copyAndRemoveAllKeys($context.args.input, ["id"]).entrySet() )
-  #if( $util.isNull($entry.value) )
-    #set( $discard = $expRemove.add("#$entry.key") )
-    $util.qr($expNames.put("#$entry.key", "$entry.key"))
-  #else
-    $util.qr($expSet.put("#$entry.key", ":$entry.key"))
-    $util.qr($expNames.put("#$entry.key", "$entry.key"))
-    $util.qr($expValues.put(":$entry.key", $util.dynamodb.toDynamoDB($entry.value)))
-  #end
-#end
-#set( $expression = "" )
-#if( !$expSet.isEmpty() )
-  #set( $expression = "SET" )
-  #foreach( $entry in $expSet.entrySet() )
-    #set( $expression = "$expression $entry.key = $entry.value" )
-    #if( $foreach.hasNext() )
-      #set( $expression = "$expression," )
-    #end
-  #end
-#end
-#if( !$expAdd.isEmpty() )
-  #set( $expression = "$expression ADD" )
-  #foreach( $entry in $expAdd.entrySet() )
-    #set( $expression = "$expression $entry.key $entry.value" )
-    #if( $foreach.hasNext() )
-      #set( $expression = "$expression," )
-    #end
-  #end
-#end
-#if( !$expRemove.isEmpty() )
-  #set( $expression = "$expression REMOVE" )
-  #foreach( $entry in $expRemove )
-    #set( $expression = "$expression $entry" )
-    #if( $foreach.hasNext() )
-      #set( $expression = "$expression," )
-    #end
-  #end
-#end
-#set( $update = {} )
-$util.qr($update.put("expression", "$expression"))
-#if( !$expNames.isEmpty() )
-  $util.qr($update.put("expressionNames", $expNames))
-#end
-#if( !$expValues.isEmpty() )
-  $util.qr($update.put("expressionValues", $expValues))
+  #set( $expressionValues = $util.defaultIfNull($condition.expressionValues, {}) )
+  $util.qr($expressionValues.putAll($versionedCondition.expressionValues))
+  #set( $condition.expressionValues = $expressionValues )
 #end
 {
   "version": "2017-02-28",
-  "operation": "UpdateItem",
-  "key": {
-      "id": {
-          "S": "$context.args.input.id"
-    }
-  },
-  "update": $util.toJson($update),
+  "operation": "DeleteItem",
+  "key": #if( $modelObjectKey ) $util.toJson($modelObjectKey) #else {
+  "id": $util.dynamodb.toDynamoDBJson($ctx.args.input.id)
+} #end,
   "condition": $util.toJson($condition)
 }
