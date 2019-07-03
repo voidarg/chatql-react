@@ -6,6 +6,6 @@
             "Outputs.UserPoolId"
         ]
     },
-    "S3DeploymentBucket": "chatql-react-master-20190703111839-deployment",
+    "S3DeploymentBucket": "chatql-react-master-20190703123256-deployment",
     "S3DeploymentRootKey": "amplify-appsync-files/e6869b8e1c3e6aded8c66295cfbf7fa132f29006"
 }

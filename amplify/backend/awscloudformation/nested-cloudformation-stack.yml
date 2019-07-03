@@ -81,11 +81,10 @@
 		"authcognito5a6ec086": {
 			"Type": "AWS::CloudFormation::Stack",
 			"Properties": {
-				"TemplateURL": "https://s3.amazonaws.com/chatql-react-master-20190703111839-deployment/amplify-cfn-templates/auth/cognito5a6ec086-cloudformation-template.yml",
+				"TemplateURL": "https://s3.amazonaws.com/chatql-react-master-20190703123256-deployment/amplify-cfn-templates/auth/cognito5a6ec086-cloudformation-template.yml",
 				"Parameters": {
 					"identityPoolName": "cognito5a6ec086_identitypool_5a6ec086",
 					"allowUnauthenticatedIdentities": true,
-					"thirdPartyAuth": false,
 					"lambdaLogPolicy": "cognito5a6ec086_lambda_log_policy",
 					"openIdLambdaRoleName": "cognito5a6ec086_openid_lambda_role",
 					"openIdRolePolicy": "cognito5a6ec086_openid_pass_role_policy",
@@ -109,6 +108,7 @@
 					"userpoolClientName": "cognito5a6ec086_app_client",
 					"userpoolClientGenerateSecret": true,
 					"userpoolClientRefreshTokenValidity": 30,
+					"userpoolClientWriteAttributes": "email",
 					"userpoolClientReadAttributes": "email",
 					"mfaLambdaRole": "cognito5a6ec086_totp_lambda_role",
 					"mfaLambdaLogPolicy": "cognito5a6ec086_totp_lambda_log_policy",
@@ -118,7 +118,8 @@
 					"userpoolClientLogPolicy": "cognito5a6ec086_userpoolclient_lambda_log_policy",
 					"userpoolClientLambdaPolicy": "cognito5a6ec086_userpoolclient_lambda_iam_policy",
 					"userpoolClientSetAttributes": false,
-					"useDefault": "default",
+					"thirdPartyAuth": false,
+					"useDefault": "manual",
 					"resourceName": "cognito5a6ec086",
 					"authSelections": "identityPoolAndUserPool",
 					"authRoleName": {
@@ -139,6 +140,7 @@
 							"Arn"
 						]
 					},
+					"hostedUI": false,
 					"env": "master"
 				}
 			}
@@ -146,14 +148,14 @@
 		"analyticschatqlreact": {
 			"Type": "AWS::CloudFormation::Stack",
 			"Properties": {
-				"TemplateURL": "https://s3.amazonaws.com/chatql-react-master-20190703111839-deployment/amplify-cfn-templates/analytics/pinpoint-cloudformation-template.json",
+				"TemplateURL": "https://s3.amazonaws.com/chatql-react-master-20190703123256-deployment/amplify-cfn-templates/analytics/pinpoint-cloudformation-template.json",
 				"Parameters": {
 					"appName": "chatqlreact",
-					"roleName": "pinpointLambdaRole662aef7b",
-					"cloudWatchPolicyName": "cloudWatchPolicy662aef7b",
-					"pinpointPolicyName": "pinpointPolicy662aef7b",
-					"authPolicyName": "pinpoint_amplify_662aef7b",
-					"unauthPolicyName": "pinpoint_amplify_662aef7b",
+					"roleName": "pinpointLambdaRolef0b15ce2",
+					"cloudWatchPolicyName": "cloudWatchPolicyf0b15ce2",
+					"pinpointPolicyName": "pinpointPolicyf0b15ce2",
+					"authPolicyName": "pinpoint_amplify_f0b15ce2",
+					"unauthPolicyName": "pinpoint_amplify_f0b15ce2",
 					"authRoleName": {
 						"Ref": "AuthRoleName"
 					},
@@ -173,7 +175,7 @@
 		"apichatqlreact": {
 			"Type": "AWS::CloudFormation::Stack",
 			"Properties": {
-				"TemplateURL": "https://s3.amazonaws.com/chatql-react-master-20190703111839-deployment/amplify-cfn-templates/api/cloudformation-template.json",
+				"TemplateURL": "https://s3.amazonaws.com/chatql-react-master-20190703123256-deployment/amplify-cfn-templates/api/cloudformation-template.json",
 				"Parameters": {
 					"AppSyncApiName": "chatqlreact",
 					"AuthCognitoUserPoolId": {
@@ -182,7 +184,7 @@
 							"Outputs.UserPoolId"
 						]
 					},
-					"S3DeploymentBucket": "chatql-react-master-20190703111839-deployment",
+					"S3DeploymentBucket": "chatql-react-master-20190703123256-deployment",
 					"S3DeploymentRootKey": "amplify-appsync-files/e6869b8e1c3e6aded8c66295cfbf7fa132f29006",
 					"env": "master"
 				}
